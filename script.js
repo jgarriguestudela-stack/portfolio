@@ -31,13 +31,29 @@
   function drawFrame(index){ const img=frames[index]; if(img&&img.complete) drawCover(img); }
 
   function preloadFrames(){
-    for(let i=1;i<=FRAME_COUNT;i++){
-      const img=new Image();
-      img.onload=()=>{ framesLoaded++; if(framesLoaded===1) drawFrame(0); if(framesLoaded===FRAME_COUNT) allFramesReady=true; };
-      img.src=frameUrl(i);
-      frames[i-1]=img;
-    }
+  for (let i = 2; i <= FRAME_COUNT; i++) {
+    const img = new Image();
+    img.onload = () => {
+      framesLoaded++;
+      if (framesLoaded === FRAME_COUNT - 1) {
+        allFramesReady = true;
+      }
+    };
+    img.src = frameUrl(i);
+    frames[i - 1] = img;
   }
+}
+
+function loadFirstFrame(){
+  const img = new Image();
+  img.onload = () => {
+    frames[0] = img;
+    framesLoaded++;
+    drawFrame(0);
+    preloadFrames();
+  };
+  img.src = frameUrl(1);
+}
 
   function getProgress(){
     const rect=videoScroll.getBoundingClientRect();
@@ -55,7 +71,7 @@
   }
 
   window.addEventListener('resize',resizeCanvas);
-  resizeCanvas(); preloadFrames(); requestAnimationFrame(loop);
+  resizeCanvas(); loadFirstFrame(); requestAnimationFrame(loop);
 
   // REVEALS
   const reveals=document.querySelectorAll('.reveal');
